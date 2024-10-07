@@ -67,7 +67,7 @@ This path is going to be unique to your computer. So, the book recommends that y
 For example, this is how I would use a full path to upload the `exams.rda` dataset into RStudio on my computer. Note, if you try and run the code on your computer, you will get an error saying "No such file or directory".
 
 ```{r}
-load("C:/Users/ahoward1/Documents/MAT 115/Exercises/exams.rda")
+#load("C:/Users/ahoward1/Documents/MAT 115/Exercises/exams.rda")
 ```
 
 Instead, if I use the relative path to my working directory, and assuming the dataset is also in your working directory, the below code should work on both of our machines.
@@ -254,12 +254,35 @@ tidy_countries <- countries %>% mutate(Alpha_Developed = case_when(
   Developed == 1 ~ "least developed",
   Developed == 2 ~ "developing",
   Developed == 3 ~ "developed",
-  TRUE ~ "NA"
+  TRUE ~ NA
 ))
+
+tidy_countries
 
 #base r method
 
-R_countries$Alpha_Developed <- fff
+R_countries <- countries
+
+development <- vector(length = length(countries$Developed))
+
+for(i in 1:length(development)){
+  
+  if(is.na(countries$Developed[i])){
+    development[i] = NA
+  } else {
+    if(countries$Developed[i] == 1){
+      development[i] = "least developed"
+    } else if (countries$Developed[i] == 2) {
+      development[i] = "developing"
+    } else {
+      development[i] = "developed"
+    }
+  }
+}
+
+R_countries$Alpha_Development <- development
+
+R_countries
 
 ```
 
