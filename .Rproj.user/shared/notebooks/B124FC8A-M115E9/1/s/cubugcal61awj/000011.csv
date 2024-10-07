@@ -1,0 +1,4 @@
+"0","load(""C:/Users/ahoward1/Documents/MAT 115/Exercises/exams.rda"")"
+"2","Warning: cannot open compressed file 'C:/Users/ahoward1/Documents/MAT 115/Exercises/exams.rda', probable reason 'No such file or directory'"
+"2","Error in readChar(con, 5L, useBytes = TRUE) : cannot open the connection
+"

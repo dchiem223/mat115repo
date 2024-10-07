@@ -1,0 +1,7 @@
+"0","dir <- getwd()"
+"0","print(dir)"
+"1","[1]"
+"1"," ""C:/Users/Damien Junxi Chiem/OneDrive/Desktop/DSC1/MAT115/M115E9"""
+"1","
+"
+"0","load(file.path(dir,""exams.rda""))"

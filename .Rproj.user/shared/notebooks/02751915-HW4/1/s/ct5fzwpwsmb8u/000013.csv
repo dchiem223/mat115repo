@@ -1,0 +1,4 @@
+"0",""
+"0","# draws lines and points separatley to ensure proper formatting. "
+"0","# Without this each point would be a solid line."
+"0","lines(months, govpay_bymonth$Monthly_Pay)"

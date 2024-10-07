@@ -1,0 +1,122 @@
+---
+title: "Damien Chiem Exercise 1"
+output:
+  pdf_document: default
+  
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### MAT 115
+\vspace*{-0.1in}
+### Exercise #1
+
+This document was made using RMarkdown.  RMarkdown is a format for generating reproducible reports.  There is a tutorial in Chapter 40.2 of the book that we will look at: 
+
+[rafalab.dfci.harvard.edu/dsbook/reproducible-projects-with-rstudio-and-r-markdown.html#r-markdown](https://rafalab.dfci.harvard.edu/dsbook/reproducible-projects-with-rstudio-and-r-markdown.html#r-markdown)
+
+\bigskip
+
+There is also a nice cheat sheet that will help with syntax:
+
+[www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf](https://www.rstudio.com/wp-content/uploads/2015/02/rmarkdown-cheatsheet.pdf)
+
+\bigskip
+
+Now let's start learning R. You need to install the R package called "dslabs" (Data Science Labs) and then load it. You install it using the following command:
+
+```{r, eval=FALSE}
+install.packages("dslabs")
+```
+
+Note, once a package is installed on your machine, you do not need to install it again until you get a new computer or update R.
+
+You load it by using the `library()` command as follows:
+
+```{r}
+library(dslabs)
+```
+
+If you get some kind of error message, this means you probably did not install the package. See section 1.5.
+
+**2.2** \quad Here are the solutions to the quadratic equation $x^2+x-1=0$ discussed in the book.
+
+```{r}
+a = 1 
+b = 1 
+c = -1
+root_1 = (-b + sqrt(b^2 - 4*a*c) ) / ( 2*a )
+root_2 = (-b - sqrt(b^2 - 4*a*c) ) / ( 2*a )
+```
+
+You should run this (use the green triangle on the right side) and then take a look at the two roots below.
+
+```{r}
+root_1
+root_2
+```
+
+Now replace the assignment operators `<-` with equal signs `=`. Run the code again. Does it make a difference?
+
+\bigskip
+
+*Type your answer here.* 
+
+There are no changes made when it is changed to an equals sign.
+
+\bigskip
+
+Most of the time, `<-` and `=` are interchangeable, but you should follow the book's advice and use `<-` instead of `=`.
+
+\bigskip
+
+Section 2.2.3 talks about functions such as logarithms and exponentials. Try them out.
+
+```{r}
+2^300
+sin(pi)
+#e^1
+#log(e)
+```
+
+Now try replacing `2^3` by `2^300`. What do you get? Also replace `cos(pi)` by `sin(pi)`, `exp(1)` by `e^1`, and `log(exp(1))` by `log(e)`. What do you get? 
+
+\bigskip
+
+*Write down your observations here for later use.* 
+
+Original outputs were: 8, -1, 2.718282, and 1
+
+after changing the outputs are: 2.037036e+90,  1.224606e-16, e^1 throws an error "object e" not found, and log(e)
+also causes the same error
+
+\bigskip
+
+You should also try out the `args` command and the `help` command as described in section 2.2.3.
+
+```{r}
+# write your R commands here
+args("log")
+help("log")
+```
+
+
+You may have noticed that R was not built to do arithmetic or algebra. It was built to do statistical analysis. Of course, analysis is done on data, so the basic unit we need is what most people call a spreadsheet, although R calls it a `dataframe`. You can see a list of dataframes available to you by using the `data` command.
+
+```{r}
+data()
+```
+
+The list contains the built-in datasets first, and then it lists the datasets that come with packages loaded into your R session. So to see the dslabs datasets you need to scroll to the end, or you can specify that you want only the datasets in a certain package.
+
+```{r}
+data(package='dslabs')
+```
+
+\bigskip
+
+*What happens if you change the double quotes `" "` to single quotes `' '`? What happens if you leave out quotes entirely? Write down your observations here.*
+
+single quotes and double quotes seem to work interchangeably. When you remove the quote, it detects it as an object and says it is not found. Error: object 'dslabs' not found.

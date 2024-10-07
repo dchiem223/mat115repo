@@ -1,0 +1,128 @@
+---
+title: "Chiem MAT 115 Homework 3"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+For the third homework assignment, we will use the `babynames` dataset. This is a dataset of US baby names using information provided from the US Social Security Administration (SSA). As per usual, you should write your answers in RMarkdown. The due date for this assignment is **Sept. 25 at 2:30 PM**.
+
+
+1. The `babynames` dataset is in its own package. Download it and load it into R. Display the first 8 rows of the dataset.
+
+*Note:* the `babynames` dataset is a `tibble`, which is a different format from the traditional data frame. For our purposes here, it does not influence our use of the data.
+
+```{r}
+#install.packages('babynames')
+library(babynames)
+babynames
+
+```
+
+
+2. Use your R indexing skills to find out how popular (in terms of `prop`) your given name was in the year you were born. If your name is not in the dataset, then just pick a name that interests you for whatever reason.
+```{r}
+babynames[babynames$name == "Damien" & babynames$year == 2004, ]
+#length(babynames[babynames$name == "Damien" & babynames$year == 2004, ])
+
+```
+A: for males my name had a prop of 0.00092558 and 0.00000545 for females in my birth year.
+
+3. Subset the dataset into two separate ones by `sex`. For each sex, take the top-25 names by `n`. Do not over think this request. Duplicates of a name across years is acceptable. Make a boxplot of `n` by `name`. Beautify these plots in at least two ways. What strikes you about these plots? How are they similar and how are they different?
+
+```{r}
+
+maleNames <- babynames[babynames$sex == "M",]
+
+femaleNames <- babynames[babynames$sex == "F",]
+
+maleNames <- maleNames[order(maleNames$n, decreasing = TRUE)[1:25],]
+femaleNames <- femaleNames[order(femaleNames$n, decreasing = TRUE)[1:25],]
+
+maleNames
+femaleNames
+
+boxplot(maleNames$n ~ maleNames$name)
+boxplot(femaleNames$n ~ femaleNames$name)
+
+```
+
+
+4. For the entire `babynames` dataset, write a `for` loop that calculates the mean `prop` for each `year`. In your own words, explain what the output, sequence, and body of your code are doing.
+
+```{r}
+propM <- vector(length=nrow(babynames[duplicated(babynames$year) == FALSE,]))
+each_year <- vector(length=nrow(babynames[duplicated(babynames$year) == FALSE,]))
+years <- babynames[duplicated(babynames$year) == FALSE, ]
+
+for(i in 1:length(propM)){
+  tempMatrix <- babynames[babynames$year == years$year[i],]
+
+  propM[i] <- mean(tempMatrix$prop)
+  each_year[i] <- tempMatrix$year[1]
+}
+
+#system.time(for(i in 1:length(propM)){
+  #tempMatrix <- babynames[babynames$year == years$year[i],]
+
+  #propM[i] <- mean(tempMatrix$prop)
+  #each_year[i] <- tempMatrix$year[1]
+#}) # 2.14 seconds
+
+#propM
+#each_year
+
+propM_and_year <- data.frame(year = each_year, mean_prop = propM)
+propM_and_year
+```
+
+OUTPUTS:
+
+My outputs are propM which holds each mean for each year without including duplicates. The first item would represent 1880 and so on.
+
+Each_year holds the corresponding year for each mean in propM.
+
+years was a way  to access a specific year so I could create a temporary matrix to calculate to mean.
+
+Both of these values were then placed in a dataframe to organize them.
+
+BODY and Sequence:
+
+The for loop iterates from 1:138 (length of propM which is how many non duplicate years there are)
+
+It begins by creating a temporary matrix which stores only the data from a particular year (by subsetting).
+During each iteration, tempMatrix would be reassigned a subset of babynames that only contained the data of a particular year.
+
+I then used the mean() function to calculate the mean prop of the matrix and then added it to prop via indexing.
+I then also added the current year to Each_year. The loop would repeat this process once it has reached 138/length of prop.
+
+
+
+5. Is there a relationship between `year` and its mean `prop`? Make the appropriate graph to show this relationship and add custom axis labels. Describe in words any relationship you see.
+
+```{r}
+
+with(propM_and_year, plot(year, mean_prop))
+
+```
+
+A: 
+mean_prop = average of proportions of each name in a given year(proportion of people of a particular sex with a particular name)
+year = each year that this study was conducted.
+
+As the year increases, the prop of names overall decreases each year.A possible conclusion that can be drawn from this data is that people are having less children which is why names are becoming "less popular". If there are less children being had then there would be less names being given, thus decreasing the prop overall each year.
+
+
+6. Explain why a `for` loop is not the best way to complete the above task. Explore the `tapply` function and use it to produce the same variable you did in question 4. You could use `dplyr` functionality, as well, we just haven't gotten there in class, yet.
+```{r}
+tapply(babynames$prop, babynames$year, mean)
+#system.time(tapply(babynames$prop, babynames$year, mean)) #about 3 second run time
+
+```
+
+A: For loops in general take longer in R since it is a statistical programming language. In this case, my loop ran faster than tapply function. I think for a much larger data set this will not be the case. Although it ran somewhat faster, it is more complicated than just using vectorize function. There are more variables, and more operations being performed (that are visible) which can make it harder to understand and make it slower when the ranges become larger (e.g 1- 1e^9).
+ 
+
+**Bonus:** Given my kids recent birthday, tell me your best dad joke. Double bonus if it has relevance to this class:

@@ -1,0 +1,414 @@
+---
+title: 'Chiem Exercise 8'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### MAT 115
+\vspace*{-0.2in}
+### Exercise #8 
+
+
+\bigskip
+
+In this exercise we are going to continue exploring the tidyverse (sections 4.5 to 4.14 of the text). We will mostly be focusing on the programming concept called piping.
+
+This will be a two-class day exercise. Stop around line 150 on the first day and finish the rest on the second day.
+
+As usual, we first load `dslabs` and `tidyverse`. We will use a new dataset for this exercise. It is the `starwars` dataset from the `dplyr` package (this seems appropriate, no?). Note, `tidyverse` is actually a set of packages and `dplyr` is part of that set, so you do not need to load it separately.
+
+```{r warning=FALSE, message=FALSE}
+library(tidyverse)
+library(dslabs)
+```
+
+\textbf{4.5} \quad How do we calculate the value of $\sin(\sqrt{e^x})$ when $x=1.38629$? Well, we execute the following steps:
+
+$$
+1.38629 \to e^{1.38629}=4 \to \sqrt{4}=2 \to \sin(2)=0.91
+$$
+The function notation $\sin(\sqrt{e^x})$ is in a sense backwards. When we plug in $x=1.38629$, the first thing we do is take the exponential, not the sine. The sequence of calculation steps is more in keeping with how we humans think. The R pipe `%>%` is an attempt to implement this step-by-step way of thinking. When we write something like `LHS %>% RHS`, it means that the function on the RHS takes the LHS as its first argument. So `2 %>% exp` means the same thing as `exp(2)`, and `8 %>% log(2)` means the same thing as `log(8,2)`.
+
+```{r}
+# Try out those commands. 
+2 %>% exp
+#exp(2)
+
+8 %>% log(2)
+#log(8, 2)
+```
+
+Recall that we can use the `mutate` function to constructed new dataframes. Here is an example:
+
+```{r}
+newwars <- mutate(starwars,avHW=(height+mass)/2)
+#newwars
+```
+
+This can also be written as
+
+```{r}
+newwars <- starwars %>% mutate(avHW=(height+mass)/2)
+head(newwars)
+```
+
+*Which of these two versions do you find more intuitive? Why?*
+
+(Note: with R version 4.1.0 and above, the pipe operator `|>` was included in base R. The `%>%` operator is older and part of the tidyverse. `%>%`  and `|>` work in very similar ways.)
+
+\bigskip
+
+\textbf{4.9} \quad If you want to reorder the rows of a dataframe, you can use the `arrange` function. For example, if you want to sort the star wars characters based on average height and weight , you can do this:
+
+```{r}
+newwars %>% arrange(avHW)
+```
+
+The sorting is done lowest to highest by default. Explore the help documentation of `arrange` and try to figure out how to sort highest to lowest.
+
+```{r}
+# Write your code here.
+newwars %>% arrange(desc(avHW));
+```
+
+Reproduce this outcome with base R functionality.
+
+```{r}
+# Write your code here.
+newwars[order((newwars$height+newwars$mass)/2, decreasing = TRUE),]
+```
+
+
+It is also possible to sort using two columns. 
+
+```{r}
+newwars %>% arrange(height, mass) %>% head(20)
+```
+
+*Inspect this output and explain in your own words how `arrange` sorts by two columns. How does it handle `NA` values?*
+
+A: Irregardless of mass, it seems to sort by height in ascending order, ignoring the NA mass values. It sorts based on the first column. If you switch mass and height, it sorts by mass in ascending order. If you get rid of second arg, it doesn't change the order.
+
+
+Confirm your understanding by sorting using mass first then height.
+
+```{r}
+# Write your code here.
+
+newwars %>% arrange(mass, height) %>% head(20)
+
+```
+
+
+\bigskip
+
+There is also a `top_n` function that is useful when we want to take a quick look at the top _n_ values of the data without fully rearranging the rows. 
+
+```{r}
+newwars %>% top_n(5,avHW)
+```
+
+\bigskip
+
+*What do you think occurs if we use a negative number for n? Try it out.*
+
+Use your new skills to determine the 10 oldest characters in the starwars dataset.
+
+```{r}
+# Write your code here.
+newwars %>% top_n(10, birth_year)
+```
+
+
+\bigskip
+
+
+
+\textbf{4.7} \quad The `summarize` function is probably the most complicated of the `dplyr` functions we look at here. Its purpose is to calculate summaries (such as mean, median, standard deviation, etc) of the variables in a dataframe. By itself it doesn't do much; other functions do the actual work.
+
+```{r}
+newwars %>% summarize(avgH=mean(height,na.rm=T),std1=sd(height,na.rm=T))
+```
+(Note that we include the `na.rm` argument to strip NAs before the calculations.)
+
+The output is a dataframe; in this case, the output has one row and two columns. 
+
+*Describe in words what you output tells us*.
+
+How could you do this using base R functionality? 
+
+```{r}
+# Write your code here.
+data.frame(avgH = mean(newwars$height, na.rm=T), std1 = sd(newwars$height, na.rm=T))
+```
+
+
+There is a version of `summarize` called `summarize_all` that could save some time. It calculates summaries (mean, or median, or standard deviation, or others) of _all_ the variables in a dataframe. If a summary is not appropriate, it returns `NA`.
+
+```{r}
+newwars %>% summarize_all(mean, na.rm=T)
+```
+
+You can use `summarize_if` in order to avoid getting NAs.
+
+```{r}
+newwars %>% summarize_if(is.numeric, mean, na.rm=T)
+```
+
+
+Use the summarize function to make a new dataframe that is composed of the mean and standard deviation of `height` and `mass` in the `newwars` dataset.
+
+```{r}
+# Write code here.
+newwars %>% summarize(avgH=mean(height,na.rm=T),std1=sd(height,na.rm=T), avgM = mean(mass, na.rm=T), std2 = sd(mass, na.rm=T))
+```
+
+
+But the real usefulness of `summarize` is when you combine it with the function `group_by`. When applied to a dataframe, the `group_by` function produces an object called a _grouped dataframe_, which is pretty similar to an ordinary dataframe, except it is aware that the data is divided into several groups. 
+
+Groups are determined by categorical variables. Let's apply the `group_by` function to the newwars.
+
+```{r}
+newwars$species <- as.factor(newwars$species)
+groupedwars <- newwars %>% group_by(species)
+head(groupedwars)
+```
+
+Not much different from just the `newwars` dataframe. It just identifies the groups and changes how it acts with other functions. If we apply the `summarize` function to this new dataframe, using the `height`, we get the following:
+
+```{r}
+summarize(groupedwars,avg=mean(height, na.rm=T))
+```
+
+We get the mean of the height of each group. Compare that with what we get if the dataframe is not grouped:
+
+```{r}
+summarise(newwars, avg=mean(height, na.rm=T))
+```
+
+We get the mean height of _all_ the characters in the dataset.
+
+A final note: we can get the means of all the groups with one line of code if we use pipes.
+
+```{r}
+newwars %>% group_by(species) %>% summarize(avg=mean(height,na.rm=T))
+```
+
+For the purposes of readability, I actually prefer to put each step of the process on different lines, as below:
+
+```{r}
+newwars %>% 
+  group_by(species) %>% 
+  summarize(avg=mean(height,na.rm=T))
+```
+
+*Below is another example. Explain in your own words what it does in a step-by-step manner.*
+
+A: newwars is being accessed so then it can use the group_by() function to group the homeworld variable. This new dataframe is accessed by the summarize function in order to find the standard deviations of the heights. These are then assigned to newwars2 in order to create a dataframe with the homeworlds and the standard deviations
+
+```{r}
+newwars2 <- newwars %>% 
+  group_by(homeworld) %>% 
+  summarize(sd=sd(height,na.rm=T)) 
+newwars2
+```
+
+Let's use the famous `iris` dataset to get a little more practice. It has measurements of lengths and widths of three kinds of irises: setosa, versicolor, and virginica.
+
+[Link: Iris wikipedia](https://en.wikipedia.org/wiki/Iris_(plant))
+
+Calculate the average `Petal.Width` by `Species` *and* put the values in DESCENDING order by the average. Do all of this in one series of pipes.
+
+```{r}
+# Write your code here.
+iris %>% 
+  group_by(Species) %>% 
+  summarize(AvgPW = mean(Petal.Width, na.rm=T)) %>% 
+  arrange(desc(AvgPW))
+```
+
+Here is another challenge. Can you do the SAME thing I asked you to do with the iris data but with base R functionality? Give it your best attempt.
+
+```{r}
+# Write your code here.
+species <- unique(iris$Species)
+mean1 <- mean(iris$Petal.Width[iris$Species == species[1]])
+mean2 <- mean(iris$Petal.Width[iris$Species == species[2]])
+mean3 <- mean(iris$Petal.Width[iris$Species == species[3]])
+
+AvgPW <- c(mean1, mean2, mean3)
+Species <- rev(species)
+AvgPW <- rev(AvgPW)
+
+Petals <- data.frame(Species, AvgPW)
+Petals
+```
+
+*What do you think of piping? Do you find it intuitive and useful, or are you annoyed that you have another thing to learn?*
+
+A: I do find it a lot more intuitive. Trying to find a way to do the same things with base R functionality is much harder and you have to got through a lot more steps. The syntax also makes more sense.
+
+OK, so we have all this nice wrangled data. What is something we can do with it? Make a plot! For the mean `Petal.Width` by `Species` data we have a quantitative numeric variable (`Petal.Width`) and a categorical variable (`Species`). This means we make a barplot. Explore the `barplot` help documentation and make the appropriate barplot.
+
+```{r}
+# Write your code here.
+
+#help('barplot')
+
+barplot(Petals$AvgPW, 
+        main = "Average Petal Widths by Species", 
+        xlab = "Species", 
+        ylab = "Mean", 
+        names.arg = Petals$Species, 
+        col = "lightblue",
+        border = "black")
+
+```
+
+
+\bigskip
+
+\textbf{4.11} \quad Section 4.11 discusses *tibbles*, which are opinionated versions of dataframes. The `tidyverse` package prefers tibbles over ordinary dataframes, for reasons listed in section 4.11. 
+
+*Read this section and explain which of the reasons given is the most compelling to you.*
+
+A: I think the versatility of it as specified in 4.11.2 is probably the most compelling reason to me. It can return a tibble, but if you want the vector/column you can still use the $ to access it. It is important that it returns a tibble when you subset because some functions require you to input a data frame which can only be done this way with tidyverse, but if you use a function requires a vector, you can just as easily access it. This allows for more functions to be used and allows for more ability to work with a data frame.
+
+\bigskip
+
+\textbf{4.8 and 4.12} \quad Read about the `pull` function and the placeholder operator in sections 4.8 and 4.12. We will use them as needed. 
+
+Write some example code that illustrates the placeholder operator. Your example MUST be different than the one given in the text.
+
+```{r}
+#Write your code here.
+
+4 %>% sqrt(x = .)
+
+c(1, 2, 3, 4, 5) %>% max(.)
+c(1, 2, 3, 4, 5) %>% min(.)
+c(1, 2, 3, 4, 5) %>% mean(.)
+```
+
+
+\textbf{4.13} \quad The `purrr` package is described in section 4.13. Within the purrr function is the `map` function, which does similar things to `sapply`.
+
+`sapply` applies functions over a list, vector, matrix, or dataframe. For example, we can use it if we want the mean for all the quantitave variables in our `newwars` dataframe:
+
+```{r, warning=F}
+sapply(newwars, mean, na.rm=T)
+```
+
+`map` does basically the same thing, but is preferred over `sapply` because it *always* returns a list. Whereas, what `sapply` returns depends on what you give it.
+
+```{r, warning=F}
+map(newwars, mean, na.rm=T)
+```
+
+The `map_dbl` function always returns a vector of numerical values.
+
+```{r, warning=F}
+map_dbl(newwars, mean, na.rm=T)
+```
+
+Use both `sapply` and `map_dbl` to produce the means of all the numerical variables in the `iris` dataset. Do the results look similar to each other?
+
+```{r, warning=F}
+# Write your code here.
+sapply(iris, mean, na.rm=T)
+map_dbl(iris, mean, na.rm=T)
+```
+A: The results look identical.
+
+\bigskip
+
+\textbf{4.14} \quad Often we need to define a new categorical variable based on the values of some other variable. We do this by using use the `case_when` and `between` operators.
+
+The `between` function determines if a value falls within an interval. So we can ask the hard hitting questions like is Luke Skywalker's height between 1.5 and 2 meters?
+
+```{r}
+between(newwars$height[newwars$name=="Luke Skywalker"],150,200)
+```
+Using `between` is certainly easier than relying only on the `>` and `<` operators. Reproduce the above between code using the `>` and `<` operators.
+
+```{r}
+newwars$height[newwars$name=="Luke Skywalker"] > 150 & newwars$height[newwars$name=="Luke Skywalker"] < 200
+```
+
+
+Now use the `between` function to determine if Darth Vader's height is between that of Luke Skywalker and Chewbacca.
+
+```{r}
+#Write your code here.
+between(newwars$height[newwars$name == "Darth Vader"], 
+        newwars$height[newwars$name == "Luke Skywalker"], 
+        newwars$height[newwars$name == "Chewbacca"])
+
+#newwars$height[newwars$name == "Darth Vader"] --> 202
+#newwars$height[newwars$name == "Luke Skywalker"] --> 172
+#newwars$height[newwars$name == "Chewbacca"] --> 228
+```
+
+
+The `case_when` function is useful for vectorizing conditional statements. It is similar to `ifelse` but can output any number of values, as opposed to just TRUE or FALSE.
+
+```{r}
+case_when(
+  between(newwars$height[newwars$name=="Luke Skywalker"],150,200) ~ "Luke Skywalker is between 150 and 200 cm tall.",
+  TRUE ~ "Luke Skywalker is not between 150 and 200 cm tall")
+```
+Now let's get to the part where we define a new categorical variable based on the values of some other variable. Let's create a categorical height variable for the star wars characters.
+
+```{r}
+newwars3 <- newwars %>% mutate(catheight = case_when (
+  between(height,0,99) ~ "Short",
+  between(height,100,199) ~ "Medium",
+  between(height,200,299) ~ "Tall",
+  TRUE ~ "F"
+))
+
+head(newwars3)
+```
+
+Now it is your turn. For the exams dataset, create a categorical grade variable for exam1 where 45-50 is an "A", 40-44 is a "B", 35-39 is a "C", and 30-34 is a "D".
+
+```{r}
+# Write your code here.
+load('exams.rda')
+exams3 <- exams %>% mutate(catgrade = case_when(
+  between(exam1,45,50) ~ "A",
+  between(exam1,40,44) ~ "B",
+  between(exam1,35,39) ~ "C",
+  between(exam1,30,34) ~ "D",
+  TRUE ~ "F"
+))
+
+exams3
+```
+
+Bonus: can you figure out how to make a barplot showing the frequencies of each letter grade?
+
+```{r}
+# Write your code here.
+count <- table(exams3$catgrade)
+grade <- unique(exams3$catgrade)
+barplot(count, 
+        main = "Grade Frequencies", 
+        xlab = "Letter Grade", 
+        ylab = "Frequency",
+        col = "tan")
+```
+
+If you are interested in even more practice, work through the exercises in sections 4.6, 4.10, and 4.15 of the textbook:
+
+[rafalab.dfci.harvard.edu/dsbook/tidyverse.html#exercises-10](https://rafalab.dfci.harvard.edu/dsbook/tidyverse.html#exercises-10)
+
+[rafalab.dfci.harvard.edu/dsbook/tidyverse.html#exercises-11](https://rafalab.dfci.harvard.edu/dsbook/tidyverse.html#exercises-11)
+
+[rafalab.dfci.harvard.edu/dsbook/tidyverse.html#exercises-12](https://rafalab.dfci.harvard.edu/dsbook/tidyverse.html#exercises-12)

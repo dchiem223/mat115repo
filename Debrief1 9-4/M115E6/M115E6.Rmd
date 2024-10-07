@@ -1,0 +1,276 @@
+---
+title: ""
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### MAT 115
+\vspace*{-0.1in}
+### Exercise #6
+
+Chapter 3 of the text covers programming basics.  We will focus on conditional expressions (3.1), functions (3.2), and for-loops (3.4).
+
+Conditional expressions use if-else statements.  Let's look at the first example from the text.  The goal of this example is to print the reciprocal of `a` unless `a` is 0:
+
+```{r}
+a <- 2
+
+if(a!=0){
+  
+  print(1/a)
+  
+  } else{
+  
+  print("No reciprocal for 0.")
+  
+  }
+  
+```
+
+What happens if we set `a` equal to 2?
+
+A: It prints out .5 which is 1/2
+
+Now lets look at an example using the `temp_carbon` dataset in the `dslabs` package.  First, we need to load the package.
+
+```{r}
+library(dslabs)
+
+# Write the code to look at the help documentation for the temp_carbon data here.
+help('temp_carbon')
+```
+
+The output from the example code below will indicate whether maximum land or ocean temperature anomalies are greater. Anomaly in this context is difference from 20th century mean values.
+
+Before 1880, there is no anomaly data, so we must remove those rows before running the loop. The missing data here are identified with NAs.
+
+```{r}
+
+temp_carbon_complete <- temp_carbon[which(temp_carbon$temp_anomaly!="NA"),]
+
+if (max(temp_carbon_complete$land_anomaly) > max(temp_carbon_complete$ocean_anomaly)) {
+  
+  print("Max land temp anomaly is higher than max ocean temp anomaly")
+
+} else {
+  
+    print("Max ocean temp anomaly is higher than max land temp anomaly")
+  
+  }
+```
+
+A related function called 'ifelse' is very useful because it works on vectors. The following example is similar to the first example from this exercise, but `a` is a vector.
+
+```{r}
+a <- c(0, 1, 2, -4, 5)
+ifelse(a > 0, 1/a, NA)
+```
+
+*What happens if you try to run the first example but with `a` as a vector instead of a scalar?*
+```{r}
+
+#b <- c(0, 1, 2, -4, 5) 
+
+#if(b!=0){
+  
+  #print(1/a)
+  
+  #} else{
+  
+  #print("No reciprocal for 0.")
+  
+  #}
+
+
+
+```
+A: It gives me an error because it is trying to compare a vector an numeric value.
+
+Write an `ifelse` statement that returns "value > 0" for ocean anomaly values above 0 and "value <= 0" for values below 0.
+
+```{r}
+# Write your code chunk here.
+ifelse(temp_carbon_complete$ocean_anomaly > 0, print("value > 0"), print("value <= 0"))
+```
+
+\bigskip
+
+Section 3.2 covers functions.  One of the many reasons R is so powerful is that it has common operations (eg, `max`, `min`, `length`, `sum`) built into it as functions. However, you can also write your own functions, pretty cool!
+
+The text does a good job of going through the form of a function. Here is an example that calculates mean:
+
+```{r}
+avg <- function(x){
+  
+  s <- sum(x)
+  
+  n <- length(x)
+  
+  s/n
+
+  }
+```
+
+Once you create the function, you can use it:
+
+```{r}
+avg(a)
+avg(temp_carbon_complete$temp_anomaly)
+```
+
+(Note that variables assigned inside the function are *NOT* saved in the workspace.)
+
+Here is another example of a function that calculates the percent difference between two means:
+
+```{r}
+perc_diff <- function(x,y) {
+  
+  xm <- mean(x)
+  ym <- mean(y)
+   
+  z <- (xm-ym)/xm
+  
+  z
+  
+}
+```
+
+You can use it to compare the means of land and ocean anomalies across all the years:
+
+```{r}
+perc_diff(temp_carbon_complete$land_anomaly,temp_carbon_complete$ocean_anomaly)
+```
+
+Try modifying the `perc_diff` function so that it calculates the percent difference relative to the `y` variable instead of the `x` variable.
+
+```{r}
+# Write your code chunk here.
+perc_diff <- function(x,y) {
+  
+  xm <- mean(x)
+  ym <- mean(y)
+   
+  z <- (ym-xm)/ym
+  
+  z
+  
+}
+
+perc_diff(temp_carbon_complete$land_anomaly,temp_carbon_complete$ocean_anomaly)
+```
+
+
+\bigskip
+
+Section 3.4 covers for-loops. Imagine we want to calculate the median value for all columns in the `temp_carbon_complete` dataset. We could just use the `median` function once for each variable:
+
+```{r}
+median(temp_carbon_complete$year)
+median(temp_carbon_complete$temp_anomaly)
+median(temp_carbon_complete$land_anomaly)
+median(temp_carbon_complete$ocean_anomaly)
+median(temp_carbon_complete$ocean_carbon_emissions)
+```
+
+Or we could use a for-loop.
+
+```{r}
+m <- vector(length=ncol(temp_carbon_complete)) # 1. output
+
+for (i in 1:length(m)) {                       # 2. sequence
+  
+  m[i] <- median(temp_carbon_complete[,i])     # 3. body
+  
+}
+
+m
+```
+
+(Note: we have some missing values in the carbon emission variable, so the median is returned as NA)
+
+To help us understand what happened here, we can separate the loop into three parts:
+
+1. The output: before you start the loop, you must always allocate sufficient space for the output. In this case the number of columns in the data frame.  This is very important for efficiency: if you grow the for loop at each iteration using `c()` (for example), your for loop will be very slow.
+
+A general way of creating an empty vector of given length is the `vector()` function. It has two arguments: the type of the vector (“logical”, “integer”, “double”, “character”, etc) and the length of the vector.
+
+2. The sequence: this determines what to loop over: each run of the for loop will assign `i` to a different value from `1:length(m)`.
+
+3. The body: this is the code that does the work. It’s run repeatedly, each time with a different value for `i`. The first iteration calculates the median of the first column and so on.
+
+If you are still having trouble wraping your head around the for-loop, here is an even simpler example: 
+
+```{r}
+m <- 1:5               # output
+
+for(i in 1:length(m)){ # sequence
+  
+  print(m[i])          # body
+  
+}
+```
+
+*Can you explain in your own words what this loop does?*
+
+A: The for loop starts at 1 and goes to 5 using i as a tracker in order to check if 5 has been reached or not. i is also used to access each index of m.
+ 
+Try writing a for-loop that creates a vector of the difference between ocean and land anomalies for each year in the `temp_carbon_complete` dataset.
+
+```{r}
+# Write your code chunk here.
+#View(temp_carbon_complete)
+
+m <- vector(length=nrow(temp_carbon_complete))
+
+for(i in 1:length(m)){
+  
+  diff <- temp_carbon_complete$ocean_anomaly[i] - temp_carbon_complete$land_anomaly[i]
+  m[i] <- diff
+}
+
+m
+
+```
+
+
+For-loops are a foundational programming tool.  However, we rarely use them in R.  Instead, we use vectorized functions because they typically result in shorter, clearer, and faster running code.
+
+For example, instead of using a for-loop to calculate the medians of each column in the `temp_carbon_complete` dataset we can use the `apply` function:
+
+```{r}
+apply(temp_carbon_complete,MARGIN = 2,FUN = median)
+```
+
+The `margin` argument applies the function to either rows (1) or columns (2) of the array (`temp_carbon_complete`).
+
+Loops with complex computations or long sequences can take a long time to execute. Let's compare how long it takes for R to calculate the square root of all whole numbers between 1 and 1e+8 using a `for-loop` or just the `sqrt` function.  
+
+We can measure execution time with the `system.time` function. The execution time of code relates most closely to the *user* value given by 'system.time'.  The vectorized function should be significantly faster.
+
+```{r}
+system.time (for (i in 1:1e+9) { 
+
+sqrt(i)
+
+})
+
+rm(i)
+```
+
+```{r}
+system.time(sqrt(1:1e+9))
+#system.time(sqrt(1:1e+11))
+```
+
+Try increasing and decreasing the order of magnitude of the numbers used in the calculations above. 
+
+*How do the execution times change? Did any of them surprise you and why?*
+
+A: Anything below e+8 is almost a second less for just sqrt() and anything above e+8 takes significantly longer by about 8 more second.
+Also e+10 and above results in an error for me that says Error: cannot allocate vector of size [74.5] gb.
+(The brackets are there for larger e+ values)
+
+Anything below e+8 for the for loop is also much faster but it is still not as fast as just using the sqrt() function. e+9 for the for loop took signicantly longer than the sqrt() function. It surprised me that it was almost a 41 second difference which is a gigantic gap.

@@ -1,0 +1,4 @@
+"0",""
+"0","countries_health <- select(countries, Country, Health, HIV, BirthRate, LifeExpectancy)"
+"0",""
+"0","countries_health"

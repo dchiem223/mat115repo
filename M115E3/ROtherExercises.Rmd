@@ -1,0 +1,31 @@
+```{r}
+#Exercises from Book
+temp <- c(35, 88, 42, 84, 81, 39)
+
+city <- c("Beijing", "Lagos", "Paris", "Rio de Janeiro", "San Juan", "Toronto")
+
+names(city) <- temp
+
+city[1:3]
+city[3]
+city[5]
+
+12:73
+
+numbers <- seq(1, 99, 2)
+numbers
+
+num2 <- seq(6, 54, 4/7);
+num2
+
+#a <- seq(1, 10, .5)
+#class(a) # --> numeric
+
+a <- seq(1, 10)
+class(a) # --> integer
+
+x <- c("1", "3", "5")
+as.integer(x)
+x
+
+```

@@ -1,0 +1,5 @@
+"0","countries_mod <- mutate(countries, density=(Population/LandArea))"
+"0",""
+"0","#countries_mod$density <- countries$Population / countries$LandArea"
+"0",""
+"0","countries_mod"

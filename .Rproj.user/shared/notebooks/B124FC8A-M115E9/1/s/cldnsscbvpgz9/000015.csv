@@ -1,0 +1,6 @@
+"0","# Write your code here."
+"0",""
+"0","#help(readxl)"
+"0",""
+"0","countries2 <- read_excel(""C:/Users/Damien Junxi Chiem/OneDrive/Desktop/DSC1/MAT115/M115E9/AllCountries.xls"")"
+"0","countries2"

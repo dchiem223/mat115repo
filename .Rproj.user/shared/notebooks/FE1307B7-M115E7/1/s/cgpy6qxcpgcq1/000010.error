@@ -1,0 +1,1 @@
+{"frames":[{"func":"with(temp_carbon, plot(temp_anomaly, carbon_emissions, col = \"red\", \n    xlab = \"Temperature Anomaly\", ylab = \"Carbon Emissions\"))","file":"","line_number":0,"end_line_number":0,"character_number":0,"end_character_number":0}],"message":"Error: object 'temp_carbon' not found\n"}

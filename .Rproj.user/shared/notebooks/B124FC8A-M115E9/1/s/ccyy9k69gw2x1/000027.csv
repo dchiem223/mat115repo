@@ -1,0 +1,3 @@
+"0",""
+"0","countries_arranged <- countries %>% arrange(desc(Population))"
+"0","countries_arranged[1:5,]"

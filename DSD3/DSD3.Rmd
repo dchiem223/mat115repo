@@ -1,0 +1,30 @@
+---
+title: ''
+output: pdf_document
+---
+
+```{r}
+# load packages
+require(wordcloud2)
+require(googlesheets4)
+require(tidyverse)
+```
+
+
+```{r}
+# import data and name variable
+cloud_data <- read_sheet("https://docs.google.com/spreadsheets/d/10afkYnxM_NmeGSjpsnu_D1CgHmZPelL-kgW7i_Zmc58/edit?usp=sharing")
+names(cloud_data) <- c("Function")
+```
+
+```{r}
+# create frequencies of functions
+cloud_data <- cloud_data %>%
+  count(Function)
+```
+
+```{r}
+# generate diamond shaped word cloud
+wordcloud2(data=cloud_data, size = 0.5, shape = "diamond")
+```
+

@@ -1,0 +1,186 @@
+---
+title: "Damien Chiem Exercise 2"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### MAT 115
+\vspace*{-0.1in}
+### Exercise #2
+
+As before, we load the `dslabs` package first.
+
+```{r warning=FALSE}
+library(dslabs)
+```
+
+Section 2.4 is mostly about dataframes. Take a look at dataframes that are included in the `dslabs` package by using the following command:
+
+```{r}
+data(package="dslabs")
+```
+
+Pick one of the dataframes and look at it. (R is not very visual. It can be a bit disorienting if you are used to looking at spreadsheets in Excel or Sheets.) There are many ways to take a look: you can just type the name of the dataset, you can use the `View()` command (note the capital V, R is case sensitive), you can use the `head` command (shows the first 6 rows of a dataframe), and there are others.
+
+```{r}
+death_prob #2015 US Period Life Table
+```
+
+```{r}
+# Write the name of a dataframe between the parenthesis below in View, 
+# then remove the comment sign. Run the chunk.
+View(death_prob)
+```
+
+```{r}
+# Write the name of a dataframe between the parenthesis below. 
+# Remove the comment sign. 
+head(death_prob)
+```
+
+At this point you probably want to use `View()` since it gives you the most familiar version of a dataframe. But others are useful too.
+
+\bigskip
+
+Section 2.4.3 introduces the very common operator `$`. We use it to refer to a variable (i.e., a column) in a dataframe. To be specific, let's take a look at the `movielens` dataframe. The following command tells you the names of the columns in the `movielens` dataframe:
+
+```{r}
+names(movielens)
+```
+
+To refer to the column `rating`, we say `movielens$rating`. For example, to calculate the mean of the ratings, we write:
+
+```{r}
+mean(movielens$rating)
+```
+
+Analogy: when we fill out an official form, we usually write the family name first, followed by the given name (for example: Howard, Aaron). The name of the dataframe corresponds to the family name, and the name of the variable corresponds to the given name. And `$` corresponds to comma separating the family name from the given name.
+
+Now try to find the maximum rating of the movies. Try to find the minimum rating. You'll have to guess the appropriate commands.
+
+```{r}
+max(movielens$rating)
+min(movielens$rating)
+```
+
+
+The columns of a data frame are examples of *vectors*. See the starting discussion of section 2.4.4. There are unfortunately many types of vectors (numeric, character, logical, factor, and so on), and R treats each type differently. You can find out the type of a vector by using the `class()` command.
+
+```{r}
+class(movielens$movieId) #--> integer
+
+```
+
+Use the R chunk above to find out the type of all the variable in the data frame `movielens`.
+
+\bigskip
+
+*Type your answer here.*
+
+```{r}
+class(movielens$movieId) #--> integer
+class(movielens$title) # --> character
+class(movielens$year) # --> integer
+class(movielens$genre) # --> factor
+class(movielens$userId) # --> integer
+class(movielens$rating)# --> numeric
+class(movielens$timestamp) # --> integer
+```
+
+
+\bigskip
+
+You can also use the `str()` command to obtain a summary of the data frame:
+
+```{r}
+str(movielens)
+```
+
+Note: `str` does not mean `string`. It's actually an abbreviation for `structure`.
+
+You can see that `movielens$genres` is a *factor* with 901 *levels*. Factors and its levels are important in statistical analysis, especially in Analysis of Variance, among others. For now, think of `factor` as another word for type or kind, and `level` as the actual type or kind.
+
+For example, the type of movie might be `action` or `comedy`. Then `action` and `comedy` are two specific levels of the factor `genres`. To see the levels of a factor, you can use the `levels` command:
+
+```{r results=FALSE}
+levels(movielens$genres)
+```
+
+(When you run the code chunk above, you should see all 901 levels of `genres`. But when you knit to pdf, the `results=FALSE` option means that the list of 901 levels is hidden  --- printing out 901 items is just too much. Try it out!)
+
+Let's take a look at a different dataset, say `stars` in the `dslabs` package. 
+
+```{r}
+str(stars)
+```
+
+You can see that there are 4 variables: the name of the star, its magnitude (which is a measure of how bright the star is --- lower magnitude stars are brighter (!), the temperature of the star, and its stellar classification. 
+
+You can also see that the name of the star is misclassfied. It's not a `factor`; it should be `character`. (Why?) You can fix this mistake by reclassfying the `star` variable:
+
+```{r}
+stars$star <- as.character(stars$star)
+class(stars$star)
+```
+
+You should also note that in the dataset, the variable `type` is classified as `character`. But I think it is more appropriate to classify it as `factor` since, after all, `type` tells us what type of star it is. You should change the classification of `type` into `factor`.
+
+```{r}
+# Write your command here.
+# Then check that all four variables are now correctly classified.
+stars$type <- as.factor(stars$type)
+class(stars$star)
+class(stars$magnitude)
+class(stars$temp)
+class(stars$type)
+```
+
+When you give the command `levels(some factor)` you get a list of the levels of the factor, usually arranged alphabetically. Sometimes you want the list to be ordered by a different criterion. For example, the type of stars is in part based on its temperature. Type O is the hottest stars, type M is the coolest stars. So you might want to ask R to list the levels of `type` based on temperature, not based on the alphabet. 
+
+```{r}
+stars$type <- reorder(stars$type, stars$temp, FUN=mean)
+# now ask R to show you the levels of the factor `type`.
+# Does R list them from hottest to coolest or from coolest to hottest?
+levels(stars$type)
+# R lists them from coolest to hottest
+```
+
+Having the levels listed in reasonable order is important later when we make visual displays (and in analyzing data too).
+
+\bigskip
+
+Section 2.4.6 is about lists. You may know that lists are one of the fundamental objects in programming languages. We won't use lists too much in this course, since we will mostly work with dataframes, but when you clean up data, you will often have to manipulate lists, so it is important to know how R handles lists. Take a look at section 2.4.6. I don't have much to add to this section. But you should know that a variable in a dataframe is a special kind of list, and the list manipulation commands can be used on it.
+
+For example, if you want to find out what star is in the fifteenth position in the `stars` dataframe, you can use the following:
+
+```{r}
+stars$star[[15]]
+```
+
+Note: You need `[[` when working with lists. This is because when `[` is applied to a list it always returns a list.  It never gives you the contents of the list. To get the contents, you need `[[`.
+
+\bigskip
+
+Finally, section 2.4.7 is about matrices. A matrix in R has to consist of data of the same type, usually numbers. So a dataframe is not a matrix. But some of the commands for matrices will work on dataframes. For example, to take a look at the 10th row of the `stars` dataframe, you can issue the following command, which uses brackets (`[ ]') for indexing.
+
+```{r}
+stars[10,]
+```
+
+This tells you that Betelgeuse is a type M star, with magnitude -5.7 and 3200 degree temperature.
+
+\bigskip
+
+```{r}
+# Take a look at all the stars' temperatures using a matrix command.
+# Can you find the mean temperature of all the stars in this dataset?
+# (You can of course use `mean(stars$temp)`, but try using the square bracket).
+
+stars[,3]
+mean(stars[,3])
+
+```
+

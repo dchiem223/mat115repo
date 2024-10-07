@@ -1,0 +1,8 @@
+"0","require(googlesheets4)"
+"0","library(tidyverse)"
+"0","gs4_auth(email = ""dchiem@fandm.edu"") # uses my school email for authorization"
+"0",""
+"0","link <- paste(""https://docs.google.com/spreadsheets/d/1W_FBpViIChZB-Yv9m1q3qrM85A"","
+"0","              ""4seNL7zjDjGa7zoaA/edit?usp=sharing"",sep="""")"
+"0",""
+"0","govpay <- read_sheet(link)"

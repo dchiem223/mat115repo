@@ -1,0 +1,34 @@
+---
+title: ''
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### MAT 115
+\vspace*{-0.1in}
+### DSD #2
+
+With your randomly assigned partner, debug (fix) this code. In your *own words* explain the errors. Submit ONE answer per group as a pdf.
+
+```{r}
+require(dslabs)
+
+# subset heights dataset to include ONLY females
+#heights_f <- subset(heights, sex="Female") should be
+heights_f <- subset(heights, sex=="Female")
+heights_f
+
+# make a histogram of the height variable in your newly subsetted data frame
+#hist(height) #should be
+hist(heights_f$height)
+```
+
+A: On line 23 it was originally heights_f <- subset(heights, sex="Female") and it should be heights_f <- subset(heights, sex=="Female"). The error was the = sign. It should be == because that is the comparison operator. The regular = sign is the assignment operator.
+
+The second error was on line 26. It was originally hist(heights). it should be hist(heights_f$heights) because it first needs to be using the subset and second, it needs to actually access the height variable.

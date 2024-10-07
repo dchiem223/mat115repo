@@ -1,0 +1,4 @@
+"0","# Write your code here."
+"0","with(temp_carbon, plot(temp_anomaly, carbon_emissions, col=""red"", xlab=""Temperature Anomaly"", ylab=""Carbon Emissions""))"
+"2","Error: object 'temp_carbon' not found
+"

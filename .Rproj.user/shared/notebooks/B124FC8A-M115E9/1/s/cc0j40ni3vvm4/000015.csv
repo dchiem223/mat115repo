@@ -1,0 +1,20 @@
+"0","spec(countries)"
+"1","cols(
+  Country = [31mcol_character()[39m,
+  LandArea = [32mcol_double()[39m,
+  Population = [32mcol_double()[39m,
+  Energy = [32mcol_double()[39m,
+  Rural = [32mcol_double()[39m,
+  Military = [32mcol_double()[39m,
+  Health = [32mcol_double()[39m,
+  HIV = [32mcol_double()[39m,
+  Internet = [32mcol_double()[39m,
+  Developed = [32mcol_double()[39m,
+  BirthRate = [32mcol_double()[39m,
+  ElderlyPop = [32mcol_double()[39m,
+  LifeExpectancy = [32mcol_double()[39m
+)
+"
+"0","countries_classified <- filter(countries, !is.na(Developed) & !is.na(ElderlyPop))"
+"0",""
+"0","countries_classified"

@@ -1,0 +1,89 @@
+---
+title: "Chiem MAT 115 Homework 2"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+For the second homework assignment, we will explore the dataset `gapminder`, which contains data on health and income outcomes for 184 countries from 1960 to 2016. It is part of the `dslabs` package. You should write your answers in RMarkdown. The official due date for this assignment is **Sept. 16 at 2:30 PM**.
+
+1. Take a look at the structure of the dataframe. How many cases are there? How many variables? What are the types of variables in the set? Are there any that seems mis-classified? If necessary, fix them.
+
+A: 10545 rows, so there are 10545 cases. There are 3 different types variables: factor, int, and numeric. I think population may be mis-classified. It does not need to be numeric because none of the numbers are decimals. 
+
+```{r}
+library(dslabs)
+gapminder$population <- as.integer(gapminder$population)
+#class(gapminder$population)
+#gapminder
+#gapminder
+```
+
+
+2. Figure out what each column tells you.
+
+A: In order from columns 1-9: name of country, year gathered, infant mortality rate, avg. life expectancy, fertility rates, population size, country's gdp, continent located in, and region located in 
+
+
+3. This is far too much data for one homework assignment. Subset the dataset to include only data from the year 2011. Be sure to give it an appropriate name. Once you do that, remove all the rows (countries) with missing GDP data (hint: you can use the `is.na` function).
+
+```{r}
+#gapminder[gapminder$year == 2011 & !is.na(gapminder$gdp),]
+
+gapminder_subset2011 <- data.frame(gapminder[gapminder$year == 2011 & !is.na(gapminder$gdp),])
+
+```
+
+4. If the dataset goes through 2016, why do you think I told you to use 2011?
+
+A: The data after 2011 is lacking in some aspects especially their gdp. in 2016, most of the columns are missing data.
+
+
+5. Which country has the highest GDP (definition of GDP: [www.imf.org/en/Publications/fandd/issues/Series/Back-to-Basics/gross-domestic-product-GDP](https://www.imf.org/en/Publications/fandd/issues/Series/Back-to-Basics/gross-domestic-product-GDP)) in 2011? The lowest? What are the values?
+
+A: Highest GDP = 1.174422e+13 (United States) and the Lowest = 77394709 (Kiribati)
+
+```{r}
+
+#gapminder_subset2011$country[order(gapminder_subset2011)[1]]
+
+```
+
+6. Everyone (well, almost everyone) pays attention to the top and bottom, but what about the middle? I think it's useful to take a look at the typical value also. For this purpose, find the median GDP (very easy: just use the `median` function) and check if the median value actually equals any of the country values. 
+
+A: No there are not any that are equal to the median value
+
+```{r}
+
+gapminder_subset2011[gapminder_subset2011$gdp == median(gapminder_subset2011$gdp),]
+
+#gapminder[gapminder$year == 2011 & gapminder$gdp == median(temp_df$gdp),]
+
+```
+
+
+7. Perhaps raw GDP is not the best way to explore this dataset. Create a new variable, GDP per population, and add it to the dataframe. Then answer the same questions as before: which country has the greatest GDP per person? The least?
+
+A: The least is at 109.2774 per capita (Democratic Republic of the Congo) and the most is 26928586464 per capita (Luxembourg).
+
+```{r}
+gdp_per_capita <- gapminder_subset2011$gdp / gapminder_subset2011$population
+#gdp_per_capita
+
+gapminder_subset2011$gdp_per_capita <- gdp_per_capita
+#gapminder_subset[order(gapminder_subset$gdp_per_capita, decreasing = TRUE)[1],]
+
+```
+
+8. Did you find anything striking or surprising in this dataset? (You can explore some more.) We didn't even look at the *geographical* or *health* components of the dataset. Provide a value or set of values that shows this striking aspect clearly.
+
+A: I found surprising that Hong Kong had the highest life_expectancy in 2011. I originally expected it would be Japan (Although, Japan is third, with it being right behind Iceland by .30). In addition, it was also interesting to see the United States rank so low (36th) despite it being considered a "first world" or "developed" country. The US was ranked below some countries that some might consider "third world" or "developing countries" such as the Maldives, Chile, Saudi Arabia, and Costa Rica.
+```{r}
+
+gapminder_subset2011[order(gapminder_subset2011$life_expectancy, decreasing = TRUE)[1:3],]
+gapminder_subset2011[order(gapminder_subset2011$life_expectancy, decreasing = TRUE)[seq(28, 36)],] 
+# Costa Rica to US
+
+```

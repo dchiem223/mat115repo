@@ -1,0 +1,197 @@
+---
+title: 'Chiem Exercise 7'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### MAT 115
+\vspace*{-0.1in}
+### Exercise #7
+
+Chapter 4 is about working with *tidy data*. When you want to learn something from data (eg, by visualizing and/or do statistical analysis), the usual first step after collecting the data is to wrangle data into tidy format. Refer back to the image from our first day of class: [Data science proccess](https://docs.google.com/presentation/d/1E7u_30k1OGIRk8gUYnO0xPaMBNeXM0x0Qz69HOYgaS0/edit#slide=id.g26dca5c076d_0_6).
+
+
+We will use the `tidyverse` package, so let's load that first. And we might as well load the `dslabs` package also.
+
+```{r warning=FALSE, message=FALSE}
+#install.packages('tidyverse')
+library(tidyverse)
+library(dslabs)
+```
+
+\textbf{4.1} \quad Section 4.1 explains what data in tidy format looks like: each row is one observation (or *case*) and each column represents one variable pertaining to that observation. See the book for some examples. You should think of each row as a `unit of analysis`. 
+
+Sometimes the distinction between tidy and not-tidy formats is not so clear cut. We can agree that the `murders` dataset is in tidy format, since each row is one case (in this circumstance, each row is a state) and each column in one variable. The unit of analysis is a state. Among others, we want to compare the states; it's not our aim to compare countries.
+
+We can also agree that the `exams` dataset is in tidy format:
+
+```{r}
+load("exams.rda")
+head(exams)
+```
+
+where each row is a student and the variables are exam 1 score, exam 2 score, and the improvement for each student. So this format is tidy, indeed.
+
+Or is it? The data in `exams` can be formatted this way:
+
+```{r table2, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+#The following code is to make a table so that it looks OK when knitted.
+# You don't have to pay attention to the code.
+tabl <- "
+| ID  | Which Exam    | Score |
+|:---:|:--------------|------:|
+| 1   | first         | 48    |
+| 1   | second        | 48    |
+| 2   | first         | 47    |
+| 2   | second        | 46    |
+|etc  | etc           | etc   |
+"
+cat(tabl)
+```
+
+Compare this format with the fertility rate example from the `gapminder` dataset in the book: 
+
+```{r}
+# The following is code to generate the example in the book
+# You can ignore the code for now, though it is a sneak peak into our future.
+
+data("gapminder")
+tidy_data <- gapminder %>%
+  filter(country %in% c("South Korea", "Germany") & !is.na(fertility)) %>%
+  select(country, year, fertility)
+head(tidy_data, 6)
+```
+
+The new format of the `exams` data is quite similar to the fertility example.
+
+
+*Can you explain in your own words how they are similar?*
+
+A: Both are formatted in rows and columns. Each column has a heading (with the data type) thats specifies what the column represents.
+The rows contain the number of each row from 1-n. The variables are also similary spaced apart. Both only have three headings.
+
+
+So we can say that the new `exams` format is tidy. Each row represents one exam, and the variables are as indicated. In this format, the unit of analysis is an exam, not a student.
+
+*Which* tidy format you should use depends on your unit of analysis and what your goals are. In future exercises we will explore some very powerful and useful functions for converting datasets between formats in order to make them tidy.
+
+For the `exams` dataset, the main goal is to assign grades to students, so I think the first format is most useful.
+
+\bigskip
+
+*Can you think of advantages of the second format? Answer here:*
+It is more compact. It is convenient for looking at both exams because it is all in one column. 
+
+\bigskip
+
+
+\textbf{4.3} \quad Section 4.3 is basically a tour of the `dplyr` part of `tidyverse`. The package `dplyr` ("dataframe plier") was created specifically to manipulate dataframes: adding variables, selecting parts by columns and rows, and sorting rows. 
+
+First up is the `mutate` function. It is used primarily to add columns to a dataframe. You can see an example in section 4.3.1. Here is another example. Suppose you want to calculate the average exam score for each student in the `exams` dataset. You actually know how to do this without using `mutate`, but let's use it anyway.
+
+```{r}
+newexams <- mutate(exams, average=(exam1+exam2)/2)
+head(newexams)
+```
+
+Note that we do not have to  use the `$` symbol here. *Can you explain why?*
+A: We have already listed data fram in first argument
+
+\bigskip
+
+*Suppose there is a third exam in the class. How do you add exam3 scores to the `exams` dataframe? Answer here:*
+
+A: Using mutate you would input it as the second argument. 
+
+\bigskip
+
+*Of course, you already know how to add a new column to a dataframe. How do you do it without the `dplyr` package?*
+
+A: dataframe$[newColumnName] <- [newColumnName]
+
+```{r}
+# Try it out here.
+#exams3 <- 1:19;
+
+#exams$exams3 <- exams3
+
+#exams
+```
+
+\bigskip
+
+We use `mutate` to add columns to a dataframe. We can use `select` to delete columns. For example, suppose we want to delete the `improve` column from the `newexams` dataframe. 
+
+```{r}
+select(newexams,-improve)
+```
+
+Note the minus sign in front of the `improve` variable name. This tells the `select` function to delete that variable. What happens if we do not use the minus sign? Can you do this same thing using base R functionality?
+
+A: It will remove everything except improve. 
+
+```{r}
+# Try it out here.
+#exams$exams3 <- NULL
+#exams
+# Try also having more than one column included.
+```
+
+So the `select()` function basically chooses which columns to include. Using a minus sign signifies the opposite of inclusion. For rows, we use the `filter()` function. Note that selecting certain rows basically chooses a subset of your data.
+
+For example, suppose we want to see which students have a perfect exam average.
+
+```{r}
+filter(newexams,average==50)
+```
+
+Or we want to see which students do better than the mean in exam 2:
+
+```{r}
+filter(newexams,exam2 > mean(exam2))
+```
+
+Now it's your turn. How do you select just those students whose scores on exam 1 and exam 2 are different?
+
+```{r}
+# Write your code here.
+filter(newexams,exam1 != exam2)
+# There are several ways to do this.
+```
+
+Using the `temp_carbon` dataset, select just those years with temp_anomaly values above the median value. Note, you may have to deal with "NA" values. I also recommend looking at the `temp_carbon` help documentation to find more info on the temp_anomaly variable.
+
+```{r}
+# Write your code here.
+# There are several ways to do this.
+temp_carbon <- temp_carbon[!is.na(temp_carbon$temp_anomaly),]
+med <- median(temp_carbon$temp_anomaly)
+filter(temp_carbon, temp_anomaly > med)
+```
+
+Finally, let's take the chance to review some base plotting. Using the `temp_carbon` data, make a scatterplot of the `temp_anomaly` variable versus the `carbon_emissions` variable. Format the axis labels and try figuring out how to change the color of the points on the plot (any color you want is fine).
+
+```{r}
+# Write your code here.
+with(temp_carbon, plot(temp_anomaly, carbon_emissions, col="red", xlab="Temperature Anomaly", ylab="Carbon Emissions"))
+```
+
+*Describe in your own words any pattern(s) that you see in the plot.*
+
+A: Carbon-emissions and temp_anomaly have a postiive correlation. As one increases, the other increases too.
+
+*What is the unit of analysis for this dataset as it is currently constructed?*
+
+We are comparing the relationship between temp_anomaly (in degrees Celsisus) and carbon_emissions(in metric tons). According to the graph they have a positive correlation. Temp_anomaly are directly correlated to increasing carbon_emissions.
+
+If you are interested in even more practice, work through the exercises in sections 4.2 and 4.4 of the textbook:
+
+[rafalab.dfci.harvard.edu/dsbook/r-basics.html#exercises-8](https://rafalab.dfci.harvard.edu/dsbook/tidyverse.html#exercises-8)
+
+[rafalab.dfci.harvard.edu/dsbook/r-basics.html#exercises-9](https://rafalab.dfci.harvard.edu/dsbook/tidyverse.html#exercises-9)

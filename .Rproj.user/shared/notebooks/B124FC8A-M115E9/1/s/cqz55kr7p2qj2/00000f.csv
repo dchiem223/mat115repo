@@ -1,0 +1,13 @@
+"0","# Write your commands here."
+"0","# You should give the file a name, like `countries`."
+"0",""
+"0","countries <- read_csv(""C:/Users/Damien Junxi Chiem/OneDrive/Desktop/DSC1/MAT115/M115E9/AllCountries.csv"")"
+"2","[1mRows: [22m[34m213[39m [1mColumns: [22m[34m13[39m"
+"2","[36m──[39m [1mColumn specification[22m [36m────────────────────────────────────────────────────────────────────────────────────────────────[39m
+[1mDelimiter:[22m "",""
+[31mchr[39m  (1): Country
+[32mdbl[39m (12): LandArea, Population, Energy, Rural, Military, Health, HIV, Internet, Developed, BirthRate, ElderlyPop, Li..."
+"2","
+[36mℹ[39m Use `spec()` to retrieve the full column specification for this data.
+[36mℹ[39m Specify the column types or set `show_col_types = FALSE` to quiet this message."
+"0","countries"
