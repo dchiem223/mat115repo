@@ -1,0 +1,279 @@
+---
+title: ''
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### MAT 115
+\vspace*{-0.2in}
+### Exercise #10
+
+Chapter 7 is an introduction to data visualizations. Visualizations reveal patterns in the data that are not obvious from just looking at numbers. We have discussed this a few times (including in lecture), and we will discuss them again in class, so I do not want to belabor the point now. The book also has several examples, and of course you should read them.
+
+\bigskip
+Chapter 8 introduces the tools we will use to produce some of visualizations, namely, the package `ggplot2`. This package is part of the `tidyverse`, so we should begin by loading it. We might as well load `dslabs` also, since the example in the book uses the `murders` dataset from `dslabs`.
+
+```{r message=FALSE, warning=FALSE}
+library(dslabs)
+library(tidyverse)
+```
+
+You may be asking yourself why we are learning a new plotting function when we have already spent time with base R's `plot`. Well, ggplot is preferred because it has greater functionality (more people are developing the `ggplot2` package) and it works by building plots with layers, which is similar in concepts (and somewhat in form) to piping. In other words, it has some of the ease of use and readability that comes with piping.
+
+We will explore the functionality of `ggplot2` with plots of two numerical variables, or scatterplots. The appropriate type of plot depends largely on the types of variable you want to visualize. We will explore other plot types later.  
+
+We will start our exploration of `ggplot2` using the `countries` dataframe. You should load that first.
+
+```{r}
+# Write your code here.
+```
+
+One thing you probably know already is that the variable `Developed` is classified as `numeric`.
+
+```{r}
+# Write the code to determine the type (hint: or class) of the 'Developed' variable.
+class(countries$Developed)
+```
+
+But it really should be a `factor` variable since it classifies countries: 1 means "least developed", 2 means "developing", and 3 means "developed". So, just like the review we did of chapter 5, we should add a new variable (call the new variable `ecotype`) using this type of classification. To avoid confusion with the original dataframe, we'll give the new dataframe a different name, say `countries2.`
+
+```{r}
+# Write your read code here.
+```
+
+We'll work with the new dataframe `countries2`.
+
+The nice thing about `ggplot2` is that it constructs the desired plot in stages (or "layers"). You combine the stages using a simple `+` symbol. (This is different from using `%>%`.) The first stage is simply to tell `ggplot` what data we are using.
+
+```{r}
+g1 <- ggplot(data=countries2)
+g1
+```
+
+If you display this, you get an empty plot, since we haven't told `ggplot` what kind of plot to draw. 
+
+Note: you can also display a plot by surrounding the code with parentheses:
+
+```{r}
+(g1 <- ggplot(data=countries2))
+```
+
+
+The next step is to specify what variables we want to use, and what roles they should play. This is called "specifying the aesthetic mapping" (I don't know why the word "aesthetic" is used here --- to me it seems inappropriate.) At the minimum, we should specify the `x` variable, and usually we should specify the `y` variable also. 
+
+```{r}
+g1 <- ggplot(data=countries2, aes(x = BirthRate, y = LifeExpectancy))
+g1
+```
+
+Note, that you can add `aes` as a new layer using `+`, but I prefer adding it as part of the `ggplot` layer by typing `ggplot(data=countries2, aes( x = BirthRate, y = LifeExpectancy) )`. If you display this, you get an empty grid, with `BirthRate` on the x-axis and `LifeExpectancy` on the y-axis. 
+
+The next step is to specify what plot we want to draw. The book shows a scatterplot, and we can do the same thing with our different dataset using `geom_point`.
+
+```{r}
+g1 <- ggplot(data=countries2, aes(x = BirthRate, y = LifeExpectancy)) +
+  geom_point()
+g1
+```
+
+The display shows a scatterplot, of course. The scatterplot shows us the relationship between the birth rate of a country and its life expectancy. 
+
+Note, that a warning is also displayed because of missing values. If you remove the missing values the warning will no longer occur.
+
+\bigskip
+
+*What is the story told by the scatterplot?*
+
+\bigskip
+
+
+Quite often you want to add something to a plot: a title, a more descriptive label for the x- or y-axis, and so on.
+
+Here is an example. Suppose you want to explain that the entries in `BirthRate` are the number of births per 1000 population, and `LifeExpectancy` is measured in years. You can use the `xlab` and `ylab` functions to provide your own labels on the x- and y-axes. While we are at it, let's add a title to the graph, using the `ggtitle` function.
+
+```{r}
+g1 <- ggplot(data=countries2, aes(x = BirthRate, y = LifeExpectancy)) +
+  geom_point() +
+  xlab("Births per 1000 population") +
+  ylab("Life expectancy in years") +
+  ggtitle("Birth Rates and Life Expectancy among Countries")
+g1
+```
+
+As you gain more experience with ggplot, you will come to realize that there are almost innumerable functions and arguments. They are pretty much impossible to memorize. There should be a few that you become comfortable with, but Posit provides a useful cheat sheet ([link:](https://rstudio.github.io/cheatsheets/html/data-visualization.html?_gl=1*z6tv2s*_ga*MTM2NDgxOTM5LjE2OTQwMjgyNTI.*_ga_2C0WZ1JHG0*MTY5NzMwMjM0Ny44LjAuMTY5NzMwMjM0Ny4wLjAuMA..)). Note, the link to the cheat sheet in your text seems to be broken).
+
+\bigskip
+
+To label the points on a scatterplot you need to indicate which variable will be used as a label for the points, and since this involves a variable, you have to do this inside an `aes` function. To show the country labels, you need to use `geom_text()`. 
+
+```{r}
+g1 <- ggplot(data=countries2, aes(x=BirthRate, y=LifeExpectancy, label=Country)) +
+  geom_point() +
+  xlab("Births per 1000 population") +
+  ylab("Life expectancy in years") +
+  ggtitle("Birth Rates and Life Expectancy among Countries") +
+  geom_text()
+g1
+```
+
+This was a bad idea. There are so many points and the name of the countries are so long that the plot becomes impossible to read. It's better to leave out the country names.
+
+But at least this attempt introduced us to the `geom_text` function, which enables us to place text anywhere we want. This could be useful! For example, we might want to attach a label to some of the points in the scatterplot (but not all of them). Israel, for example, has pretty high fertility rate for a country with such a high life expectancy. Use your data wrangling skills to find Israel's values for those two statistics.
+
+```{r}
+# Write code here.
+```
+
+We can now attach a label to Israel.
+
+```{r}
+g1 <- ggplot(data=countries2, aes(x=BirthRate, y=LifeExpectancy, label=Country)) +
+  geom_point() +
+  xlab("births per 1000 population") +
+  ylab("life expectancy in years") +
+  ggtitle("Birth Rates and Life Expectancy among Countries") +
+  geom_text(aes(x=21.5,y=81,label="Israel"),nudge_y=-0.8)
+g1
+```
+
+Note the values chosen for the x- and y-axes of `geom_text` and the use of `nudge_y` in the code above. *Can you describe in words what `nudge_y` does?*
+
+\bigskip
+
+*Try to label some other noteworthy points. *
+
+```{r}
+# Write code here.
+```
+
+
+\bigskip
+
+Another thing we might want to do is to use different colors on the scatterplot to indicate different types of countries. So the developed countries will be colored one color, the developing countries another color, and the least developed countries a third color. This can also be done using the `col` option inside the aesthetic for `geom_point`.
+
+```{r}
+g1 <- ggplot(data=countries2, aes(x=BirthRate, y=LifeExpectancy, col=ecotype)) +
+  geom_point() +
+  xlab("births per 1000 population") +
+  ylab("life expectancy in years") +
+  ggtitle("Birth Rates and Life Expectancy among Countries") +
+  scale_color_discrete(name = "Economic Status")
+g1
+```
+
+\bigskip
+
+*Note the last tweak of the graph above: it uses the function `scale_color_discrete`. What happens if you don't use it?*
+
+\bigskip
+
+Note also that, unless you removed them from your dataset, NA is included among the type of countries. Maybe this is OK?  The NA indicates that the country is not classified, but such countries are included in the scatterplot anyway.  The main point is to see the relationship between birth rates and life expectancy, so perhaps the NA countries should be included in the data? If so, they might make less clear the effect of economic development.
+
+\bigskip
+
+*Use `filter` to include only countries whose economic classification is know.*
+
+```{r}
+# Write code here.
+```
+
+
+\bigskip
+
+It is also possible to change the size of the dots to indicate some other variable. The usual choice to make it indicate population: the larger the dot, the larger the population of the country.
+
+```{r}
+g1 <- ggplot(countries2, aes(x=BirthRate, y=LifeExpectancy)) +
+  geom_point(aes(size=Population,col=ecotype))
+g1
+```
+
+**These graphs are pretty slick, however, I would caution you from making plots that include too much information (too many variables presented in too many ways). Remember, plots are meant to hit the reader over the head with a big frying pan. Do not overwhelm them.**
+
+\bigskip
+
+You can also change the appearances of minor aspects of the plot by changing its *theme*. The package `ggplot2` comes with several themes; for example, you can try using `theme_bw()` to change (just a bit!) the appearance of the graph above. The gray background is replaced by a white background. This is my personal preference.
+
+```{r}
+g1 + 
+  theme_bw()
+```
+
+More elaborate changes can be found by using external packages. For example, you can install the `ggtheme` package and then load it.
+
+```{r}
+library(ggthemes)
+```
+
+Then you can try out various themes:
+
+```{r}
+g1 + theme_excel() # I don't like this one
+g1 + theme_fivethirtyeight()
+```
+
+You can take a look at some of the themes [here](https://statisticsglobe.com/ggthemes-package-r).
+
+You can also create customized themes (by making a function) that combines all the `theme()` elements you want! You can then apply it to your graphs to make things easier and increase consistency. 
+
+```{r}
+theme_coding <- function(){            # creating a new theme function
+  theme_bw()+                          # using a predefined theme as a base
+  theme(axis.text.x = element_text(size = 12, angle = 45, vjust = 1, hjust = 1),       # customizing lots of things
+        axis.text.y = element_text(size = 12),
+        axis.title = element_text(size = 14),
+        panel.grid = element_blank(),
+        plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), units = , "cm"),
+        plot.title = element_text(size = 20, vjust = 1, hjust = 0.5),
+        legend.text = element_text(size = 12, face = "italic"),
+        legend.title = element_blank(),
+        legend.position = c(0.88, 0.62))
+}
+
+g1+theme_coding()
+```
+
+
+\bigskip
+
+Now let's apply the examples and exercises above to a different dataset. Let's take a look again at the `mtcars` dataset.
+
+Try to take a look at the relationship between the weight of a car and its fuel efficiency, using a scatterplot.
+
+1. First make the scatterplot.
+
+```{r}
+    
+```
+
+2. Adjust the `x` and `y` labels to be more informative.
+
+```{r}
+
+```
+
+3. Label the points. Is it too crowded? Read about the `ggrepel` package in chapter 8.11. It could be useful here.
+
+```{r}
+    
+```
+
+4. Use color to show whether the cars are automatic or manual transmission. Note that the `am` column is classified as numeric. It should be re-classified. Also, the numbers 0 and 1 are not very informative. You should change them to `automatic` and `manual` (you can use `case_when`).
+
+
+```{r}
+    
+```
+
+5. Think about what other variable can be represented in your graph, indicated by the size of the points. You should show your final graph!
+
+```{r}
+
+```
+
